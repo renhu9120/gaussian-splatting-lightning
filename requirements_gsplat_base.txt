@@ -1,0 +1,13 @@
+lightning[pytorch-extra]==2.3.*
+pytorch-lightning==2.3.*
+bitsandbytes==0.45.*
+
+splines==0.3.0
+plyfile==0.8.1
+tensorboard
+wandb
+tqdm
+viser==0.2.3
+opencv-python-headless==4.10.*
+matplotlib
+mediapy==1.2.2
