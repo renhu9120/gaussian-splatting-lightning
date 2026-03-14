@@ -1,0 +1,33 @@
+# 3DGS Baseline Platform Record
+
+## Environment
+- OS: Windows
+- Conda env: gspl39
+- Python: 3.9
+- torch: 2.0.1+cu118
+- CUDA: 11.8
+- GPU: RTX 3060 Laptop GPU
+- MSVC: 14.31
+
+## Repository
+- Project: gaussian-splatting-lightning
+- Local path: D:\Programming\Python\3DGS\platform_new\gaussian-splatting-lightning
+
+## Git snapshot
+- freeze commit: a384859
+- baseline tag: baseline-gspl39-3dgs-stable
+- baseline branch: baseline/original-gspl39
+- dev branch: feature/quaternion-3dgs-v1
+
+## Successful extensions
+- simple_knn
+- gsplat
+- diff_gaussian_rasterization
+
+## Stable pipeline
+- fit works
+- validate works
+- viewer works
+- intermediate checkpoint saving works
+- metric export works
+- training progression figure works
