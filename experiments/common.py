@@ -80,11 +80,20 @@ def find_checkpoint_by_step(exp_name: str, step: int | None = None) -> Path:
 def find_training_config(exp_name: str) -> Path:
     """
     Use the training-time saved config.yaml, which is the safest config source for validate.
+    Tries common Lightning CLI log dir layouts: version_0/ and lightning_logs/version_0/.
     """
-    config_path = OUTPUT_ROOT / exp_name / "lightning_logs" / "version_0" / "config.yaml"
-    if not config_path.exists():
-        raise FileNotFoundError(f"Training config not found: {config_path}")
-    return config_path
+    candidates = [
+        OUTPUT_ROOT / exp_name / "config.yaml",
+        OUTPUT_ROOT / exp_name / "version_0" / "config.yaml",
+        OUTPUT_ROOT / exp_name / "lightning_logs" / "version_0" / "config.yaml",
+    ]
+    for config_path in candidates:
+        if config_path.exists():
+            return config_path
+    raise FileNotFoundError(
+        f"Training config not found for experiment '{exp_name}'.\n"
+        f"Tried: {[str(p) for p in candidates]}"
+    )
 
 
 def python_executable() -> str:

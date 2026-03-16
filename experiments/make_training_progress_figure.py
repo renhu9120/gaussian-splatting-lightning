@@ -10,38 +10,38 @@ from PIL import Image
 
 
 # =============================================================================
-# USER CONFIG
+# USER CONFIG：实验输出目录结构为 outputs/<EXPERIMENT_DIR>/validate/stepXXXXX/
 # =============================================================================
-DATASET = "lego"          # 例如: "drums" / "ship" / "chair" / "lego"
-IMAGE_NAME = "r_0.png.jpg"     # 指定要跟踪的固定视角图片名
+EXPERIMENT_DIR = "phase_c1_lego"   # 方法_数据集，如 baseline_lego / phase_a_lego
+IMAGE_NAME = "r_0.jpg"             # 验证输出文件名（无扩展名 + .jpg），如 r_0.jpg / r_1.jpg
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
-SAVE_DIR = OUTPUT_ROOT / f"{DATASET}_training_progress_report"
+VALIDATE_ROOT = OUTPUT_ROOT / EXPERIMENT_DIR / "validate"
+SAVE_DIR = OUTPUT_ROOT / EXPERIMENT_DIR / "validate_report"
 # =============================================================================
 
 
-def extract_step_from_dirname(dirname: str, dataset_name: str) -> Optional[int]:
+def extract_step_from_step_dirname(dirname: str) -> Optional[int]:
     """
-    Parse step from names like:
-        drums_step00999_eval
-        drums_step10000_eval
+    Parse step from dir names under validate/: step00101, step10000, etc.
     """
-    pattern = rf"^{re.escape(dataset_name)}_step(\d+)_eval$"
-    m = re.match(pattern, dirname)
+    m = re.match(r"^step(\d+)$", dirname)
     if m is None:
         return None
     return int(m.group(1))
 
 
-def find_eval_dirs(output_root: Path, dataset_name: str) -> List[Tuple[int, Path]]:
+def find_eval_dirs(validate_root: Path) -> List[Tuple[int, Path]]:
+    """Find step dirs (step00101, step00501, ...) under validate_root."""
+    if not validate_root.exists():
+        return []
     results: List[Tuple[int, Path]] = []
-    for p in output_root.iterdir():
+    for p in validate_root.iterdir():
         if not p.is_dir():
             continue
-        step = extract_step_from_dirname(p.name, dataset_name)
+        step = extract_step_from_step_dirname(p.name)
         if step is not None:
             results.append((step, p))
-
     results.sort(key=lambda x: x[0])
     return results
 
@@ -172,7 +172,7 @@ def make_progress_figure(
 
         axes[i].set_title("\n".join(title_lines), fontsize=10)
 
-    fig.suptitle(f"{DATASET}: iterative progression on {image_name}", fontsize=14)
+    fig.suptitle(f"{EXPERIMENT_DIR}: iterative progression on {image_name}", fontsize=14)
     plt.tight_layout()
     fig.savefig(save_path, dpi=250, bbox_inches="tight")
     plt.close(fig)
@@ -215,32 +215,32 @@ def plot_metric_curves(df: pd.DataFrame, save_path: Path) -> None:
 def main() -> None:
     SAVE_DIR.mkdir(parents=True, exist_ok=True)
 
-    eval_dirs = find_eval_dirs(OUTPUT_ROOT, DATASET)
+    eval_dirs = find_eval_dirs(VALIDATE_ROOT)
     if not eval_dirs:
         raise FileNotFoundError(
-            f"No eval dirs found under '{OUTPUT_ROOT}' for dataset '{DATASET}'."
+            f"No step dirs (step00101, ...) found under '{VALIDATE_ROOT}'."
         )
 
     df = collect_metric_table(eval_dirs)
 
     # Save metric summary
-    metrics_csv_path = SAVE_DIR / f"{DATASET}_metrics_summary.csv"
+    metrics_csv_path = SAVE_DIR / f"{EXPERIMENT_DIR}_metrics_summary.csv"
     df.to_csv(metrics_csv_path, index=False, encoding="utf-8-sig")
 
     print("=" * 100)
-    print(f"[INFO] Dataset: {DATASET}")
+    print(f"[INFO] Experiment: {EXPERIMENT_DIR}")
     print(f"[INFO] Metrics summary saved to: {metrics_csv_path}")
     print("=" * 100)
     with pd.option_context("display.max_columns", None, "display.width", 180):
         print(df)
 
     # Metric curves
-    curve_path = SAVE_DIR / f"{DATASET}_metric_curves.png"
+    curve_path = SAVE_DIR / f"{EXPERIMENT_DIR}_metric_curves.png"
     plot_metric_curves(df, curve_path)
     print(f"[INFO] Metric curves saved to: {curve_path}")
 
     # Progress figure
-    progress_path = SAVE_DIR / f"{DATASET}_iterative_progress_{Path(IMAGE_NAME).stem}.png"
+    progress_path = SAVE_DIR / f"{EXPERIMENT_DIR}_iterative_progress_{Path(IMAGE_NAME).stem}.png"
     make_progress_figure(df, eval_dirs, IMAGE_NAME, progress_path)
     print(f"[INFO] Progress figure saved to: {progress_path}")
 

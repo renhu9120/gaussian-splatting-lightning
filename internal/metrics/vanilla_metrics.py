@@ -69,15 +69,32 @@ class VanillaMetricsImpl(MetricImpl):
         ssim_metric = self.ssim(image, gt_image)
         loss = (1.0 - self.lambda_dssim) * rgb_diff_loss + self.lambda_dssim * (1. - ssim_metric)
 
-        return {
+        metrics = {
             "loss": loss,
             "rgb_diff": rgb_diff_loss,
             "ssim": ssim_metric,
-        }, {
+        }
+        prog_bar = {
             "loss": True,
             "rgb_diff": True,
             "ssim": True,
         }
+        # Phase B-3 diagnostics: passthrough for logging/CSV (do not affect loss)
+        if "diag_rotor_identity_dev" in outputs:
+            metrics["diag_rotor_identity_dev"] = outputs["diag_rotor_identity_dev"].detach()
+            prog_bar["diag_rotor_identity_dev"] = False  # log but not on progress bar
+        if "diag_rgb_rot_diff" in outputs:
+            metrics["diag_rgb_rot_diff"] = outputs["diag_rgb_rot_diff"].detach()
+            prog_bar["diag_rgb_rot_diff"] = False  # log but not on progress bar
+        # Phase C-1 diagnostics: quaternion latent decoder
+        if "diag_quat_latent_norm" in outputs:
+            metrics["diag_quat_latent_norm"] = outputs["diag_quat_latent_norm"].detach()
+            prog_bar["diag_quat_latent_norm"] = False
+        if "diag_rgb_delta_abs_mean" in outputs:
+            metrics["diag_rgb_delta_abs_mean"] = outputs["diag_rgb_delta_abs_mean"].detach()
+            prog_bar["diag_rgb_delta_abs_mean"] = False
+
+        return metrics, prog_bar
 
     def get_train_metrics(self, pl_module, gaussian_model, step: int, batch, outputs) -> Tuple[Dict[str, Any], Dict[str, bool]]:
         return self._get_basic_metrics(

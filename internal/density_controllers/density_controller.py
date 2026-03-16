@@ -51,6 +51,10 @@ class Utils:
                 assert len(group["params"]) == 1
                 assert group["name"] not in new_parameters, "parameter `{}` appears in multiple optimizers".format(group["name"])
 
+                # Skip param groups not in new_properties (e.g. global params like quat_rotor_raw)
+                if group["name"] not in new_properties:
+                    continue
+
                 extension_tensor = new_properties[group["name"]]
 
                 # get current sates
@@ -116,6 +120,10 @@ class Utils:
             for group in opt.param_groups:
                 assert len(group["params"]) == 1
                 assert group["name"] not in new_parameters, "parameter `{}` appears in multiple optimizers".format(group["name"])
+
+                # Skip params whose first dim != mask length (e.g. global params like quat_rotor_raw)
+                if group["params"][0].shape[0] != mask.shape[0]:
+                    continue
 
                 stored_state = opt.state.get(group['params'][0], None)
                 if stored_state is not None:

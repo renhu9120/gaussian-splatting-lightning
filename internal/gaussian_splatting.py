@@ -602,6 +602,8 @@ class GaussianSplatting(LightningModule):
                         image_tensor=grid,
                     )
 
+                # 使用无扩展名的 basename + .jpg，避免 image_name 已含 .png 时出现 .png.jpg 双重扩展名
+                name_stem = os.path.splitext(item["image_name"])[0].replace("/", "_")
                 image_output_path = os.path.join(
                     self.hparams["output_path"],
                     item["stage"],
@@ -609,7 +611,7 @@ class GaussianSplatting(LightningModule):
                         item["epoch"],
                         item["step"],
                     ),
-                    "{}.jpg".format(item["image_name"].replace("/", "_"))
+                    "{}.jpg".format(name_stem),
                 )
                 os.makedirs(os.path.dirname(image_output_path), exist_ok=True)
                 save_tensor_image(

@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Phase A - Lego 训练",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/experiments/run_fit.py",
+            "args": ["--case", "lego_quaternion_phase_a"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Phase A - Lego 验证全部",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/experiments/run_validate.py",
+            "args": ["--case", "lego_quaternion_phase_a", "--all_phase_a_steps"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Phase A - Lego 验证 step=10000",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/experiments/run_validate.py",
+            "args": ["--case", "lego_quaternion_phase_a", "--step", "10000"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Phase A - Lego 冒烟测试",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/experiments/run_fit.py",
+            "args": ["--case", "lego_quaternion_phase_a", "--smoke"],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

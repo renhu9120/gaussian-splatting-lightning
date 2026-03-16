@@ -1,2 +1,7 @@
 from .renderer import RendererOutputTypes, RendererOutputVisualizer, RendererOutputInfo, Renderer, RendererConfig
 from .vanilla_renderer import VanillaRenderer
+from .quaternion_interpretation_renderer import QuaternionInterpretationRenderer
+from .quaternion_rotor_renderer import QuaternionRotorRenderer
+from .per_gaussian_rotor_renderer import PerGaussianRotorRenderer
+from .view_dependent_rotor_renderer import ViewDependentRotorRenderer
+from .quaternion_latent_decoder_renderer import QuaternionLatentDecoderRenderer

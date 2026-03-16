@@ -9,12 +9,12 @@ from experiments.common import format_save_iterations, python_executable, run_co
 def build_fit_command(case_name: str, smoke: bool = False) -> list[str]:
     case = get_case(case_name)
 
-    exp_name = case.train_exp_name
+    exp_name = case.experiment_output_dir
     max_steps = case.max_steps
     save_iterations = case.save_iterations
 
     if smoke:
-        exp_name = f"{case.train_exp_name}_smoke"
+        exp_name = f"{case.experiment_output_dir}_smoke"
         max_steps = 10
         save_iterations = ()
 

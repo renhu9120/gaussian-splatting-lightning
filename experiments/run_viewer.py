@@ -8,11 +8,12 @@ from experiments.common import OUTPUT_ROOT, find_checkpoint_by_step, python_exec
 
 def build_viewer_command(case_name: str, step: int | None = None) -> list[str]:
     case = get_case(case_name)
+    exp_dir = case.experiment_output_dir
 
     if step is None:
-        target = OUTPUT_ROOT / case.train_exp_name
+        target = OUTPUT_ROOT / exp_dir
     else:
-        target = find_checkpoint_by_step(case.train_exp_name, step=step)
+        target = find_checkpoint_by_step(exp_dir, step=step)
 
     cmd = [python_executable(), "viewer.py", str(target)]
     return cmd
